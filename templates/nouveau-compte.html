@@ -1,0 +1,26 @@
+{%if hasError %} <p><strong><font color="red"> {{hasError}} </font></strong></p> {%endif%}
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<br>
+{% for message in messages %}
+<div class=flash>{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+
+
+<form method="POST" action="{{url_for('after_nouveau_compte')}}">
+  <label>Remplissez les informations nécéssaires à la création de votre compte</label><br>
+ 	<input type="text" name="name" placeholder="Nom" />
+ 	<input type="text" name="mail" placeholder="email" />
+ 	<input type="text" name="pass" placeholder="mot de passe" />
+  	<input type="submit" value="Soumettre" />	
+    </form>
+    <p>Alternativement,</p>
+
+    <br>
+    <a href="/flask">se connecter</a>
+
+

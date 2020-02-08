@@ -1,0 +1,23 @@
+{%if hasError %} <p><strong><font color="red"> {{hasError}} </font></strong></p> {%endif%}
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<br>
+{% for message in messages %}
+<div class=flash>{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<form method="POST" action="{{url_for('after_form')}}">
+  <!--
+      <input type="text" name="prenom" placeholder="*Prenom*" />
+      -->
+  <select name="prenom">
+    <option value="Mickey">Mickey Mouse</option>
+    <option value="Tintin">Tintin</option>
+    <option value="Valjean">Jean Valjean</option>
+    <option value="Homer">Homer Simpson</option>
+  </select> 
+  <input type="submit" value="Soumettre" />
+</form>

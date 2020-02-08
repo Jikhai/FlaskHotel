@@ -1,0 +1,27 @@
+{%if hasError %} <p><strong><font color="red"> {{hasError}} </font></strong></p> {%endif%}
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<br>
+{% for message in messages %}
+<div class=flash>{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<form method="POST" action="{{url_for('after_choisir_email')}}">
+  {%if rows %}
+  <label>Choisissez un Compte client</label><br>
+  <select type="text" name="email">
+    {% for row in rows %}
+    <option value="{{row[O]}}">{{row[0]}}</option>
+    {% endfor %}
+  </select><br><br>
+  {%endif%}
+  <input type="submit" value="Soumettre" />
+</form>
+<p>Alternativement,</p>
+
+<br>
+<a href="{{url_for('after_choisir_nouveau_compte')}}">Creer un nouveau compte</a>
+
