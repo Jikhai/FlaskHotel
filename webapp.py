@@ -16,15 +16,24 @@ def hello(error=None):
     return render_template("choisir-mail.html", rows=liste_mail(), hasError=error, session=session)
 
 
-@app.route("/hello/<email>")
-def hello_name(email):
-	data= "<b>Bienvenue !</b>"
-	return data
+@app.route("/menu/")
+def actionmenu(session):
+    print(str(session))
+    print("si la ligne précédente est vide ma vie est un échec")
+    print(session['email'])
+    dbresponse=pgsql_client_by_mail(session['email'])
+    print(dbresponse)
+    session['name']=dbresponse[0][0]
+    print(session['name'])
+    return render_template("choisir-action.html", session=session)
 
 @app.route('/after_choisir_email/', methods=['POST'])
 def after_choisir_email():
     session['email'] = request.form['email']
-    return hello_name(session['email'])
+    #print(request.form['email'])
+    #print(session['email'])
+    #print(session)
+    return actionmenu(session)
 
 @app.route('/after_nouveau_compte/', methods=['POST']) #compte crée
 def after_nouveau_compte():
@@ -35,7 +44,7 @@ def after_nouveau_compte():
     print(session['email'])
     print( session['pass'])
     pgsql_ajout_client(session['name'],session['email'],session['pass'])
-    return hello_name(session['email'])
+    return actionmenu(session)
 
 @app.route('/after_choisir_nouveau_compte/')
 def after_choisir_nouveau_compte(error=None):
@@ -65,17 +74,34 @@ def pgsql_select(command):
 
         cursor.close()
         db.close()
+        print('passed')
         return rows
     except Exception as e :
+        print('failed')
         flash('sorry, this service is unavailable')
         return redirect(url_for('hello',error=str(e)))
 
 def liste_mail():
     return pgsql_select('select mail from Hotel2019.Client;')
 
+def liste_chambres(idclient):
+        return pgsql_select('select * from Hotel2019.Chambres;')
+
+def liste_reserv():
+        return pgsql_select('select * from Hotel2019.Reservation where idclient=\'%s\';'% (idclient))
+        
+def liste_produits():
+    return pgsql_select('select nomproduit from Hotel2019.Bar;')
+
+
+
 def pgsql_ajout_client(newname,newmail,newpassword):
     print(newname,newmail,newpassword)
     return pgsql_insert('insert into Hotel2019.Client values(DEFAULT,\'%s\',\'%s\',\'%s\');' % (newname, newmail, newpassword))
+
+def pgsql_client_by_mail(mail):
+    print(mail)
+    return pgsql_select('select nom from Hotel2019.Client where mail=\'%s\';' % (mail))
 
 def pgsql_insert(command):
      #flash(command)

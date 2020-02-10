@@ -1,0 +1,22 @@
+{%if hasError %} <p><strong><font color="red"> {{hasError}} </font></strong></p> {%endif%}
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<br>
+{% for message in messages %}
+<div class=flash>{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<p>Bienvenue, <b>{{session['name']}}</b>, que voulez vous faire aujourd'hui ?</p><br>
+<p>Menu D'actions :</p>
+<div id=menu>
+ <a href="/flask">Commander quelque chose à boire</a><br>
+ <a href="/flask">Faire une réservation</a><br>
+ <a href="/flask">Consulter sa reservation</a><br>
+ <a href="/flask">Payer sa reservatioin</a><br>
+</div>
+
+<p>Alternativement,</p>
+ <br>
+ <a href="/flask">Retour à l'écran d'accueil</a><br>
