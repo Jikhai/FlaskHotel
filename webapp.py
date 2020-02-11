@@ -18,13 +18,13 @@ def hello(error=None):
 
 @app.route("/menu/")
 def actionmenu(session):
-    print(str(session))
-    print("si la ligne précédente est vide ma vie est un échec")
-    print(session['email'])
+    #print(str(session))
+    #print("si la ligne précédente est vide ma vie est un échec")
+    #print(session['email'])
     dbresponse=pgsql_client_by_mail(session['email'])
-    print(dbresponse)
+    #print(dbresponse)
     session['name']=dbresponse[0][0]
-    print(session['name'])
+    #print(session['name'])
     return render_template("choisir-action.html", session=session)
 
 @app.route('/after_choisir_email/', methods=['POST'])
@@ -35,14 +35,31 @@ def after_choisir_email():
     #print(session)
     return actionmenu(session)
 
+
+@app.route('/consult_reserv/', methods=['POST','GET'])
+def consult_reserv():
+    return render_template("consult-reserv.html", session=session)
+
+@app.route('/choisir_chambre/', methods=['POST','GET'])
+def choisir_chambre():
+    return render_template("choisir-chambre.html", session=session)
+    
+@app.route('/choisir_conso/', methods=['POST','GET'])
+def choisir_conso():
+    return render_template("choisir-conso.html", session=session)
+
+@app.route('/payer_reserv/', methods=['POST','GET'])
+def payer_reserv():
+    return render_template("payer-reserv.html", session=session)
+
 @app.route('/after_nouveau_compte/', methods=['POST']) #compte crée
 def after_nouveau_compte():
     session['name'] = request.form['name']
     session['email'] = request.form['mail']
     session['pass'] = request.form['pass']
-    print( session['name'])
-    print(session['email'])
-    print( session['pass'])
+    #print( session['name'])
+    #print(session['email'])
+    #print( session['pass'])
     pgsql_ajout_client(session['name'],session['email'],session['pass'])
     return actionmenu(session)
 
