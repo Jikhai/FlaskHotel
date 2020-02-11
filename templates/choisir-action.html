@@ -1,3 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+
 {%if hasError %} <p><strong><font color="red"> {{hasError}} </font></strong></p> {%endif%}
 
 {% with messages = get_flashed_messages() %}
@@ -20,3 +23,6 @@
 <p>Alternativement,</p>
  <br>
  <a href="/flask">Retour à l'écran d'accueil</a><br>
+
+{% endblock %}
+

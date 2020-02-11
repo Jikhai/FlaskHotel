@@ -1,3 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+
 {%if hasError %} <p><strong><font color="red"> {{hasError}} </font></strong></p> {%endif%}
 
 {% with messages = get_flashed_messages() %}
@@ -24,4 +27,6 @@
 
 <br>
 <a href="{{url_for('after_choisir_nouveau_compte')}}">Creer un nouveau compte</a>
+
+{% endblock %}
 
