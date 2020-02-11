@@ -11,7 +11,7 @@ body {
 	position:relative;
 	top:70px;
   background-color: darkgrey;
-  
+
 }
 p { color:white}
 h1 {
@@ -24,4 +24,30 @@ footer {
 	bottom: 0;
 	right: 0;
 	width: 100%;
+}
+table,
+td {
+    border: 2px solid black;
+		padding: 1px, 5px, 1px, 5px;
+}
+
+thead,
+tfoot {
+}
+
+
+#NotUsed {
+	width=100%;
+	outline: solid black 2px;
+  padding-top: 20px;
+	padding-bottom: 20px;
+
+}
+#NotUsed {
+	width=100%
+	outline: solid black 2px;
+}
+#NotUsed {
+	margin-left:20px;
+	margin-right: 20px;
 }

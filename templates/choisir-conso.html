@@ -12,6 +12,41 @@
 {% endif %}
 {% endwith %}
 
-<p>UnderConstruction<p>
-{% endblock %}
 
+  <table id="productlist">
+    <thead>
+        <tr>
+            <th colspan="2">Liste des produits disponibles : </th>
+        </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td>ID#</td>
+        <td>Nom</td>
+        <td>Tarif</td>
+      </tr>
+      {%if rows %}
+        {% for row in rows %}
+        <tr>
+            <td>{{row[0]}}</td>
+            <td>{{row[1]}}</td>
+            <td>{{row[2]}} €</td>
+        </tr>
+        {% endfor %}
+      {%endif%}
+    </tbody>
+</table>
+<br/>
+<p>Vous pouvez choisir une boisson, dans la liste ci-dessus :</p>
+{%if rows %}
+  {% for row in rows %}
+  {% endfor %}
+{%endif%}
+
+<p>Alternativement,</p>
+ <br>
+ <a href="{{url_for('back_to_menu')}}">Retour au menu</a><br>
+ <a href="/flask">Retour à l'écran d'accueil</a><br>
+
+{% endblock %}
