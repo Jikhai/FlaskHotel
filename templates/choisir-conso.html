@@ -38,11 +38,25 @@
     </tbody>
 </table>
 <br/>
-<p>Vous pouvez choisir une boisson, dans la liste ci-dessus :</p>
-{%if rows %}
-  {% for row in rows %}
-  {% endfor %}
-{%endif%}
+<form method="POST" action="{{url_for('confirm_conso')}}">
+  {%if rows %}
+  <label>Choisissez une consomation :</label><br>
+  <select id="consoID" type="text" name="consoID">
+    {% for row in rows %}
+    <option value={{row[0]}}>{{row[0]}}</option>
+    {% endfor %}
+  </select><br>
+  {% endif %}
+  {%if rows %}
+  <label> Une quantité :</label><br>
+  <select id="consoQTE" type="text" name="consoQTE">
+    {% for i in range(1,11) %}
+    <option value={{i}}>{{i}}</option>
+    {% endfor %}
+  </select><br><br>
+  {%endif%}
+  <input type="submit" value="Soumettre" />
+</form>
 
 <p>Alternativement,</p>
  <br>

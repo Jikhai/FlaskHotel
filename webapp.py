@@ -38,7 +38,7 @@ def after_nouveau_compte():
 @app.route('/back_to_menu/', methods=['POST','GET'])
 def back_to_menu():
     return actionmenu(session)
-    
+
 @app.route("/menu/")
 def actionmenu(session):
     #print(str(session))
@@ -61,6 +61,13 @@ def choisir_chambre():
 @app.route('/choisir_conso/', methods=['POST','GET'])
 def choisir_conso():
     return render_template("choisir-conso.html", session=session, rows=liste_produits() )
+
+@app.route('/confirmation_conso/', methods=['POST','GET'])
+def confirm_conso():
+    consoNAME = pgsql_product_by_id(request.form['consoID'])
+    consoNAME = consoNAME[0][0]
+    consoQTE = request.form['consoID']
+    return render_template("confirm-conso.html", session=session, consoQTE=consoQTE, consoNAME=consoNAME)
 
 @app.route('/payer_reserv/', methods=['POST','GET'])
 def payer_reserv():
@@ -101,12 +108,16 @@ def liste_produits():
     return pgsql_select('select * from Hotel2019.Bar;')
 
 def pgsql_ajout_client(newname,newmail,newpassword):
-    print(newname,newmail,newpassword)
+    #print(newname,newmail,newpassword)
     return pgsql_insert('insert into Hotel2019.Client values(DEFAULT,\'%s\',\'%s\',\'%s\');' % (newname, newmail, newpassword))
 
 def pgsql_client_by_mail(mail):
-    print(mail)
+    #print(mail)
     return pgsql_select('select nom from Hotel2019.Client where mail=\'%s\';' % (mail))
+
+def pgsql_product_by_id(ID):
+    print(ID)
+    return pgsql_select('select nomproduit from Hotel2019.Bar where idproduit=\'%s\';' % (ID))
 
 # -------------------------------------- DB ACCESS & CONTROLS ------
 def pgsql_select(command):
