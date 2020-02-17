@@ -19,41 +19,35 @@ def hello(error=None):
 @app.route('/after_choisir_email/', methods=['POST','GET'])
 def after_choisir_email():
     session['email'] = request.form['email']
-    #print(request.form['email'])
-    #print(session['email'])
-    #print(session)
     return actionmenu(session)
 
 @app.route('/after_nouveau_compte/', methods=['POST']) #compte crée
 def after_nouveau_compte():
-    session['name'] = request.form['name']
+    name = request.form['name']
     session['email'] = request.form['mail']
-    session['pass'] = request.form['pass']
-    #print( session['name'])
-    #print(session['email'])
-    #print( session['pass'])
-    pgsql_ajout_client(session['name'],session['email'],session['pass'])
+    mail=session['email']
+    passw = request.form['pass']
+    pgsql_ajout_client(name,mail,passw)
     return actionmenu(session)
 
 @app.route('/back_to_menu/', methods=['POST','GET'])
 def back_to_menu():
     return actionmenu(session)
 
+
 @app.route("/menu/")
 def actionmenu(session):
-    #print(str(session))
-    #print("si la ligne précédente est vide ma vie est un échec")
-    #print(session['email'])
-    dbresponse=pgsql_client_by_mail(session['email'])
-    #print(dbresponse)
-    session['name']=dbresponse[0][0]
-    #date= datetime.datetime.now()
-    #print(date.year)
-    #print(date.month)
-    #print(date.day)
-    #print(session['name'])
-    return render_template("choisir-action.html", session=session, jour=date.day, mois=date.month, annee=date.year)
+    session['name']=pgsql_client_by_mail(session['email'])[0][0]
+    session['reserv']=pgsql_exist_reserv(pgsql_clientid_by_mail(session['email'])[0][0])[0][0]
+    
+    print (session['reserv'])
+    if session['reserv']==False :
+        return render_template("no-reserv.html", session=session, jour=date.day, mois=date.month, annee=date.year)
+    elif session['reserv']==True :
 
+        return render_template("choisir-action.html", session=session, jour=date.day, mois=date.month, annee=date.year)
+    else :
+        return hello(error=None)
 @app.route('/consult_reserv/', methods=['POST','GET'])
 def consult_reserv():
     return render_template("consult-reserv.html", session=session)
@@ -87,15 +81,12 @@ def after_choisir_nouveau_compte(error=None):
 # ---------- BDD SETUP -------------
 #interaction avec PostGres
 def pgsql_connect():
-    #try connection
-    ##if session['db'] is None:
     try:
         db = psycopg2.connect("host=dbserver.emi.u-bordeaux.fr dbname=adanguin user=adanguin")
         return db
     except Exception as e :
         flash('connexion error')
         return redirect(url_for('hello',error=str(e)))
-    #return session['db']
 
 #------------------------------------ DB Commands -----
 
@@ -112,24 +103,20 @@ def liste_produits():
     return pgsql_select('select * from Hotel2019.Bar;')
 
 def pgsql_exist_reserv(idclient):
-    return pgsql_select('select exists (select true from hotel2019.Reservation where idclient=\'%s\');'% (idclient))
+    return pgsql_select('select exists (select true from hotel2019.Reservation where idclient=\'%s\' and date_fin>=current_date );'% (idclient))
 #-----------------Part II -------------
 def pgsql_client_by_mail(mail):
-    #print(mail)
     return pgsql_select('select nom from Hotel2019.Client where mail=\'%s\';' % (mail))
 
 def pgsql_clientid_by_mail(mail):
-    #print(mail)
     return pgsql_select('select idclient from Hotel2019.Client where mail=\'%s\';' % (mail))
 
 def pgsql_product_by_id(ID):
-    print(ID)
     return pgsql_select('select nomproduit from Hotel2019.Bar where idproduit=\'%s\';' % (ID))
 
 # -- Commands that WRITE to the DB ---
 
 def pgsql_ajout_client(newname,newmail,newpassword):
-    #print(newname,newmail,newpassword)
     return pgsql_insert('insert into Hotel2019.Client values(DEFAULT,\'%s\',\'%s\',\'%s\');' % (newname, newmail, newpassword))
 
 def pgsql_ajout_conso(idclient,idproduit,qte,date):
@@ -153,7 +140,6 @@ def pgsql_select(command):
         return redirect(url_for('hello',error=str(e)))
 
 def pgsql_insert(command):
-     #flash(command)
      db = pgsql_connect()
      cursor = db.cursor()
      try:

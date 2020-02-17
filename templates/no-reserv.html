@@ -12,13 +12,11 @@
 {% endif %}
 {% endwith %}
 <p>Nous sommes le {{jour}}/{{mois}}/{{annee}}.</p>
-<p>Bienvenue, <b>{{session['name']}}</b>, que voulez vous faire aujourd'hui ?</p><br>
-<p>Votre chambre est réservée jusqu'au [date] inclu.</p>
+<p>Bienvenue, <b>{{session['name']}}</b>, Vous n'avez pas de réservation en cours, vous devez en créer une afin d'accéder au reste de nos services.</p><br>
 <p>Menu D'actions :</p>
 <div id=menu>
- <a href="{{url_for('choisir_conso')}}">Commander quelque chose à boire</a><br>
+ <a href="{{url_for('choisir_chambre')}}">Faire une réservation</a><br>
  <a href="{{url_for('consult_reserv')}}">Consulter ses reservations</a><br>
- <a href="{{url_for('payer_reserv')}}">Payer sa reservation</a><br>
 </div>
 
 <p>Alternativement,</p>
