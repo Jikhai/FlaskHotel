@@ -2,8 +2,8 @@ import time
 from flask import *
 import sys
 import psycopg2
-
-
+import datetime
+date= datetime.datetime.now()
 #DO NOT TOUCH THIS
 app = Flask(__name__)
 app.secret_key = 'some_secret'
@@ -47,8 +47,12 @@ def actionmenu(session):
     dbresponse=pgsql_client_by_mail(session['email'])
     #print(dbresponse)
     session['name']=dbresponse[0][0]
+    #date= datetime.datetime.now()
+    #print(date.year)
+    #print(date.month)
+    #print(date.day)
     #print(session['name'])
-    return render_template("choisir-action.html", session=session)
+    return render_template("choisir-action.html", session=session, jour=date.day, mois=date.month, annee=date.year)
 
 @app.route('/consult_reserv/', methods=['POST','GET'])
 def consult_reserv():
@@ -66,7 +70,7 @@ def choisir_conso():
 def confirm_conso():
     consoNAME = pgsql_product_by_id(request.form['consoID'])
     consoNAME = consoNAME[0][0]
-    consoQTE = request.form['consoID']
+    consoQTE = request.form['consoQTE']
     return render_template("confirm-conso.html", session=session, consoQTE=consoQTE, consoNAME=consoNAME)
 
 @app.route('/payer_reserv/', methods=['POST','GET'])
@@ -107,18 +111,29 @@ def liste_reserv():
 def liste_produits():
     return pgsql_select('select * from Hotel2019.Bar;')
 
-def pgsql_ajout_client(newname,newmail,newpassword):
-    #print(newname,newmail,newpassword)
-    return pgsql_insert('insert into Hotel2019.Client values(DEFAULT,\'%s\',\'%s\',\'%s\');' % (newname, newmail, newpassword))
-
+def pgsql_exist_reserv(idclient):
+    return pgsql_select('select exists (select true from hotel2019.Reservation where idclient=\'%s\');'% (idclient))
+#-----------------Part II -------------
 def pgsql_client_by_mail(mail):
     #print(mail)
     return pgsql_select('select nom from Hotel2019.Client where mail=\'%s\';' % (mail))
+
+def pgsql_clientid_by_mail(mail):
+    #print(mail)
+    return pgsql_select('select idclient from Hotel2019.Client where mail=\'%s\';' % (mail))
 
 def pgsql_product_by_id(ID):
     print(ID)
     return pgsql_select('select nomproduit from Hotel2019.Bar where idproduit=\'%s\';' % (ID))
 
+# -- Commands that WRITE to the DB ---
+
+def pgsql_ajout_client(newname,newmail,newpassword):
+    #print(newname,newmail,newpassword)
+    return pgsql_insert('insert into Hotel2019.Client values(DEFAULT,\'%s\',\'%s\',\'%s\');' % (newname, newmail, newpassword))
+
+def pgsql_ajout_conso(idclient,idproduit,qte,date):
+    return pgsql_insert('insert into Hotel2019.Conso values(DEFAULT,\'%s\',\'%s\',\'%s\');' % (idclient,idproduit,qte,date))
 # -------------------------------------- DB ACCESS & CONTROLS ------
 def pgsql_select(command):
     db = pgsql_connect()
