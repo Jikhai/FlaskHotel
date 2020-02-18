@@ -12,47 +12,42 @@
 {% endif %}
 {% endwith %}
 
-<table id="productlist">
+<table id="roomlist">
   <thead>
       <tr>
-          <th colspan="2">Liste des produits disponibles : </th>
+          <th colspan="2">Liste des Chambres disponibles : </th>
       </tr>
   </thead>
 
   <tbody>
     <tr>
       <td>ID#</td>
-      <td>Nom</td>
       <td>Tarif</td>
     </tr>
     {%if rows %}
       {% for row in rows %}
       <tr>
           <td>{{row[0]}}</td>
-          <td>{{row[1]}}</td>
-          <td>{{row[2]}} €</td>
+          <td>{{row[1]}} €/Nuit </td>
       </tr>
       {% endfor %}
     {%endif%}
   </tbody>
 </table>
 <br/>
-<form method="POST" action="{{url_for('confirm_conso')}}">
+<form method="POST" action="{{url_for('confirm_reserv')}}">
 {%if rows %}
-<label>Choisissez une consomation :</label><br>
-<select id="consoID" type="text" name="consoID">
+<label>Choisissez une chambre :</label><br>
+<select id="chambreID" type="text" name="chambreID">
   {% for row in rows %}
   <option value={{row[0]}}>{{row[0]}}</option>
   {% endfor %}
 </select><br>
 {% endif %}
 {%if rows %}
-<label> Une quantité :</label><br>
-<select id="consoQTE" type="text" name="consoQTE">
-  {% for i in range(1,11) %}
-  <option value={{i}}>{{i}}</option>
-  {% endfor %}
-</select><br><br>
+<label> Une durée: (au moins une journée, et pas avant aujourd'hui)</label><br>
+<input id="date_debut" type="date" name="date_debut" min="{{date}}" required>
+<input id="date_fin" type="date" name="date_fin" min="{{tomorrow}}" required>
 {%endif%}
 <input type="submit" value="Soumettre" />
 </form>
