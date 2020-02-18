@@ -54,7 +54,8 @@ def actionmenu(session):
         return render_template("no-reserv.html", session=session, jour=date.day, mois=date.month, annee=date.year)
     elif session['reserv']==True :
 
-        return render_template("choisir-action.html", session=session, jour=date.day, mois=date.month, annee=date.year)
+        date_fin = pgsql_reserv_active(pgsql_clientid_by_mail(session['email'])[0][0])[0][0]
+        return render_template("choisir-action.html", session=session, jour=date.day, mois=date.month, annee=date.year, date_fin=date_fin)
     else :
         return hello(error=None)
 
@@ -120,6 +121,9 @@ def liste_reserv():
 
 def liste_produits():
     return pgsql_select('select * from Hotel2019.Bar;')
+
+def pgsql_reserv_active(idclient):
+    return pgsql_select('select date_fin from hotel2019.Reservation where idclient=\'%s\' and date_fin>=current_date ;'% (idclient))
 
 def pgsql_exist_reserv(idclient):
     return pgsql_select('select exists (select true from hotel2019.Reservation where idclient=\'%s\' and date_fin>=current_date );'% (idclient))
