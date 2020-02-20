@@ -16,9 +16,9 @@
 
 <form method="POST" action="{{url_for('after_nouveau_compte')}}">
   <label>Remplissez les informations nécéssaires à la création de votre compte</label><br>
- 	<input type="text" name="name" placeholder="Nom" />
- 	<input type="text" name="mail" placeholder="email" />
- 	<input type="text" name="pass" placeholder="mot de passe" />
+ 	<input type="text" name="name" placeholder="Nom" required />
+ 	<input type="text" name="mail" placeholder="email" required/>
+ 	<input type="password" name="pass" placeholder="mot de passe" required />
   	<input type="submit" value="Soumettre" />
     </form>
     <p>Alternativement,</p>

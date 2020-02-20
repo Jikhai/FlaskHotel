@@ -22,22 +22,33 @@ def hello(error=None):
 
 @app.route('/after_choisir_email/', methods=['POST','GET'])
 def after_choisir_email():
-    session['email'] = request.form['email']
-    return actionmenu(session)
+    email= request.form['email']
+    passw= request.form['passw']
+    if passw==checkpassw(pgsql_clientid_by_mail(email)[0][0])[0][0]:
+        session['email'] = request.form['email']
+        return actionmenu(session)
+    else :
+        return hello(error="Mauvais mot de passe")
 
 @app.route('/after_choisir_nouveau_compte/')
 def after_choisir_nouveau_compte(error=None):
     session.clear()
 
     return render_template("nouveau-compte.html",hasError=error, session=session)
-@app.route('/after_nouveau_compte/', methods=['POST']) #compte crée
+
+@app.route('/after_nouveau_compte/', methods=['POST','GET']) #compte crée
 def after_nouveau_compte():
     name = request.form['name']
-    session['email'] = request.form['mail']
-    mail=session['email']
+    email = request.form['mail']
     passw = request.form['pass']
-    pgsql_ajout_client(name,mail,passw)
-    return actionmenu(session)
+    for i in checkmail():
+        if i[0] == email:
+            #print("oulah")
+            return hello(error= "Mail déjà existant dans la base de données")
+    else :
+        pgsql_ajout_client(name,email,passw)
+        session['email'] = request.form['mail']
+        return actionmenu(session)
 
 @app.route('/back_to_menu/', methods=['POST','GET'])
 def back_to_menu():
@@ -53,7 +64,6 @@ def actionmenu(session):
     if session['reserv']==False :
         return render_template("no-reserv.html", session=session, jour=date.day, mois=date.month, annee=date.year)
     elif session['reserv']==True :
-
         date_fin = pgsql_reserv_active(pgsql_clientid_by_mail(session['email'])[0][0])[0][0]
         return render_template("choisir-action.html", session=session, jour=date.day, mois=date.month, annee=date.year, date_fin=date_fin)
     else :
@@ -66,6 +76,7 @@ def consult_reserv():
 
 @app.route('/choisir_chambre/', methods=['POST','GET'])
 def choisir_chambre():
+
     return render_template("choisir-chambre.html", session=session, rows=liste_chambres(), date=today, tomorrow=tomorrow)
 
 @app.route('/confirmation_reserv/', methods=['POST','GET'])
@@ -110,11 +121,19 @@ def pgsql_connect():
 
 #------------------------------------ DB Commands -----
 
+def checkmail():
+    return pgsql_select('select mail from Hotel2019.Client;')
+def checkpassw(idclient):
+    return pgsql_select('select pass from Hotel2019.Client where idclient=\'%s\';'% (idclient))
+
 def liste_mail():
     return pgsql_select('select mail from Hotel2019.Client;')
 
 def liste_chambres():
-        return pgsql_select('select * from Hotel2019.Chambre;')
+        return pgsql_select('select * from Hotel2019.Chambre where numero NOT IN (select numero from Hotel2019.Reservation where date_fin>=current_date and date_debut<=current_date);')
+
+def liste_chambres_occupees():
+        return pgsql_select('select numero from Hotel2019.Reservation where date_fin>=current_date;')
 
 def liste_reserv():
         return pgsql_select('select * from Hotel2019.Reservation where idclient=\'%s\';'% (idclient))

@@ -12,6 +12,7 @@
 {% endif %}
 {% endwith %}
 
+
 <table id="roomlist">
   <thead>
       <tr>
@@ -37,7 +38,7 @@
 <br/>
 <form method="POST" action="{{url_for('confirm_reserv')}}">
 {%if rows %}
-<label>Choisissez une chambre :</label><br>
+<label>Choisissez une chambre disponible :</label><br>
 <select id="chambreID" type="text" name="chambreID">
   {% for row in rows %}
   <option value={{row[0]}}>{{row[0]}}</option>
