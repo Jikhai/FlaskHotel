@@ -11,6 +11,36 @@
 {% endfor %}
 {% endif %}
 {% endwith %}
+   {%if rows %}		
+  <table id="reservtlist">
+    <thead>
+        <tr>
+            <th colspan="2">Liste des reservations effectuées : </th>
+        </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td>Chambre</td>
+        <td>Début</td>
+        <td>Fin</td>
+      </tr>
+     
+        {% for row in rows %}
+        <tr>
+            <td>{{row[0]}}</td>
+            <td>{{row[1]}}</td>
+            <td>{{row[2]}}</td>
+        </tr>
+        {% endfor %}
+    
+    </tbody>
+</table>
+<br/>
+{% else %}
+<p>Pas de reservations à votre actif</p>
+{% endif %}
+
 <p>Alternativement,</p>
  <br>
  <a href="{{url_for('back_to_menu')}}">Retour au menu</a><br>

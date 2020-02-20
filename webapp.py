@@ -72,7 +72,8 @@ def actionmenu(session):
 # ------------------- Réservations
 @app.route('/consult_reserv/', methods=['POST','GET'])
 def consult_reserv():
-    return render_template("consult-reserv.html", session=session)
+    rows= pgsql_liste_reserv(pgsql_clientid_by_mail(session['email'])[0][0])
+    return render_template("consult-reserv.html", session=session, rows=rows)
 
 @app.route('/choisir_chambre/', methods=['POST','GET'])
 def choisir_chambre():
@@ -135,8 +136,6 @@ def liste_chambres():
 def liste_chambres_occupees():
         return pgsql_select('select numero from Hotel2019.Reservation where date_fin>=current_date;')
 
-def liste_reserv():
-        return pgsql_select('select * from Hotel2019.Reservation where idclient=\'%s\';'% (idclient))
 
 def liste_produits():
     return pgsql_select('select * from Hotel2019.Bar;')
@@ -146,6 +145,9 @@ def pgsql_reserv_active(idclient):
 
 def pgsql_exist_reserv(idclient):
     return pgsql_select('select exists (select true from hotel2019.Reservation where idclient=\'%s\' and date_fin>=current_date );'% (idclient))
+
+def pgsql_liste_reserv(idclient):
+        return pgsql_select('select * from Hotel2019.Reservation where idclient=\'%s\';'% (idclient))
 #-----------------Part II -------------
 def pgsql_client_by_mail(mail):
     return pgsql_select('select nom from Hotel2019.Client where mail=\'%s\';' % (mail))
