@@ -12,7 +12,32 @@
 {% endif %}
 {% endwith %}
 
+<table id="reservtlist">
+  <thead>
+      <tr>
+          <th colspan="2">Facture : </th>
+      </tr>
+  </thead>
 
+  <tbody>
+    <tr>
+      <td>Chambre</td>
+      <td>Début</td>
+      <td>Fin</td>
+      <td>tarif par nuit</td>
+      <td>total chambre</td>
+      <td>total consommations</td>
+    </tr>
+      <tr>
+          <td>{{n}}</td>
+          <td>{{d}}</td>
+          <td>{{f}}</td>
+          <td>{{t}} €</td>
+          <td>{{tch}} €</td>
+          <td>{{tco}} €</td>
+      </tr>
+  </tbody>
+</table>
 
 <p>Alternativement,</p>
  <br>

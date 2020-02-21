@@ -100,18 +100,24 @@ def confirm_conso():
     consoNAME = pgsql_product_by_id(request.form['consoID'])
     consoNAME = consoNAME[0][0]
     consoQTE = request.form['consoQTE']
+    pgsql_ajout_consommation(pgsql_clientid_by_mail(session ['email'])[0][0],request.form['consoID'],consoQTE)
     return render_template("confirm-conso.html", session=session, consoQTE=consoQTE, consoNAME=consoNAME)
 # ------------------- Autres
 @app.route('/payer_reserv/', methods=['POST','GET'])
 def payer_reserv():
-    return render_template("payer-reserv.html", session=session)
+    d,f,n,t=pgsql_facture(pgsql_clientid_by_mail(session['email'])[0][0])
+    tch= int((f-d).days)*t
+    tco=pgsql_somme_conso(pgsql_clientid_by_mail(session['email'])[0][0],d,f)
+    return render_template("payer-reserv.html", session=session, d=d,f=f,n=n,t=t,tch=tch,tco=tco)
 
 
 
 
 
 # ---------- BDD SETUP -------------
-#interaction avec PostGres
+#interaction avec PostGres6
+
+4
 def pgsql_connect():
     try:
         db = psycopg2.connect("host=dbserver.emi.u-bordeaux.fr dbname=adanguin user=adanguin")
@@ -147,7 +153,26 @@ def pgsql_exist_reserv(idclient):
     return pgsql_select('select exists (select true from hotel2019.Reservation where idclient=\'%s\' and date_fin>=current_date );'% (idclient))
 
 def pgsql_liste_reserv(idclient):
-        return pgsql_select('select * from Hotel2019.Reservation where idclient=\'%s\';'% (idclient))
+    return pgsql_select('select * from Hotel2019.Reservation where idclient=\'%s\';'% (idclient))
+
+def pgsql_facture(idclient):
+    temp = pgsql_select('select date_debut, date_fin, numero from hotel2019.Reservation where idclient=\'%s\' and date_fin>=current_date ;'% (idclient))
+    d=temp[0][0]
+    f=temp[0][1]
+    n=temp[0][2]
+    temp = pgsql_select('select tarif from hotel2019.chambre where numero=\'%s\';' %(n))
+    t= temp[0][0]
+    return d,f,n,t
+def pgsql_tarifproduit(id):
+    return pgsql_select('select tarif from hotel2019.bar where idproduit=\'%s\';' %(id))
+
+def pgsql_somme_conso(idclient,d,f):
+    sum=0
+    temp = pgsql_select('select idproduit,qte from hotel2019.consommation where idclient=\'%s\' and dateconso<=\'%s\' and dateconso>=\'%s\';'%(idclient,f,d))
+    for row in temp :
+        t=pgsql_tarifproduit(row[0])[0][0]
+        sum=sum+(t*row[1])
+    return sum
 #-----------------Part II -------------
 def pgsql_client_by_mail(mail):
     return pgsql_select('select nom from Hotel2019.Client where mail=\'%s\';' % (mail))
@@ -163,8 +188,8 @@ def pgsql_product_by_id(ID):
 def pgsql_ajout_client(newname,newmail,newpassword):
     return pgsql_insert('insert into Hotel2019.Client values(DEFAULT,\'%s\',\'%s\',\'%s\');' % (newname, newmail, newpassword))
 
-def pgsql_ajout_conso(idclient,idproduit,qte,date):
-    return pgsql_insert('insert into Hotel2019.Conso values(\'%s\',\'%s\',\'%s\',\'%s\');' % (idclient,idproduit,qte,date))
+def pgsql_ajout_consommation(idclient,idproduit,qte):
+    return pgsql_insert('insert into Hotel2019.Consommation values(DEFAULT,\'%s\',\'%s\',\'%s\',current_date);' % (idclient,idproduit,qte))
 
 def pgsql_ajout_reserv(chambreID,date_debut,date_fin,clientID):
     print(chambreID)
