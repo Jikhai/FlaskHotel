@@ -11,7 +11,7 @@
 {% endfor %}
 {% endif %}
 {% endwith %}
-   {%if rows %}		
+   {%if rows %}
   <table id="reservtlist">
     <thead>
         <tr>
@@ -25,7 +25,7 @@
         <td>Début</td>
         <td>Fin</td>
       </tr>
-     
+
         {% for row in rows %}
         <tr>
             <td>{{row[0]}}</td>
@@ -33,12 +33,39 @@
             <td>{{row[2]}}</td>
         </tr>
         {% endfor %}
-    
+
     </tbody>
 </table>
 <br/>
 {% else %}
 <p>Pas de reservations à votre actif</p>
+{% endif %}
+{%if rows2 %}
+<table id="reservtlist">
+ <thead>
+     <tr>
+         <th colspan="2">Liste des factures  : </th>
+     </tr>
+ </thead>
+
+ <tbody>
+   <tr>
+     <td>Somme</td>
+     <td>Date</td>
+   </tr>
+
+     {% for row in rows2 %}
+     <tr>
+         <td>{{row[0]}} €</td>
+         <td>{{row[1]}}</td>
+     </tr>
+     {% endfor %}
+
+ </tbody>
+</table>
+<br/>
+{% else %}
+<p>Pas de factures à votre actif</p>
 {% endif %}
 
 <p>Alternativement,</p>

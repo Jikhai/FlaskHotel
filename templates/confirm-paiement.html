@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+
+{%if hasError %} <p><strong><font color="red"> {{hasError}} </font></strong></p> {%endif%}
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<br>
+{% for message in messages %}
+<div class=flash>{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<p>Bien reçu, {{session['name']}}, vous avez payé la somme de {{paid}} € il vous reste {{remain}} € à régler. Merci !</p>
+
+<br>
+<a href="{{url_for('back_to_menu')}}">Retour au menu</a><br>
+<a href="/flask">Retour à l'écran de connection</a><br>
+
+
+{% endblock %}

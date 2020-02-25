@@ -73,7 +73,8 @@ def actionmenu(session):
 @app.route('/consult_reserv/', methods=['POST','GET'])
 def consult_reserv():
     rows= pgsql_liste_reserv(pgsql_clientid_by_mail(session['email'])[0][0])
-    return render_template("consult-reserv.html", session=session, rows=rows)
+    rows2= pgsql_list_paid(pgsql_reserv_active_id(pgsql_clientid_by_mail(session['email'])[0][0])[0][0])
+    return render_template("consult-reserv.html", session=session, rows=rows, rows2=rows2)
 
 @app.route('/choisir_chambre/', methods=['POST','GET'])
 def choisir_chambre():
@@ -108,8 +109,27 @@ def payer_reserv():
     d,f,n,t=pgsql_facture(pgsql_clientid_by_mail(session['email'])[0][0])
     tch= int((f-d).days)*t
     tco=pgsql_somme_conso(pgsql_clientid_by_mail(session['email'])[0][0],d,f)
-    return render_template("payer-reserv.html", session=session, d=d,f=f,n=n,t=t,tch=tch,tco=tco)
+    sum=tch+tco
+    paid=pgsql_get_paid(pgsql_reserv_active_id(pgsql_clientid_by_mail(session['email'])[0][0])[0][0])[0][0]
+    if paid == None :
+        paid=0
+    remain = sum - paid
+    return render_template("payer-reserv.html", session=session, d=d,f=f,n=n,t=t,tch=tch,tco=tco,sum=sum,paid=paid,remain=remain)
 
+@app.route('/confirm_paiement/', methods=['POST','GET'])
+def confirm_paiement():
+    d,f,n,t=pgsql_facture(pgsql_clientid_by_mail(session['email'])[0][0])
+    tch= int((f-d).days)*t
+    tco=pgsql_somme_conso(pgsql_clientid_by_mail(session['email'])[0][0],d,f)
+    sum=tch+tco
+    paidOld=pgsql_get_paid(pgsql_reserv_active_id(pgsql_clientid_by_mail(session['email'])[0][0])[0][0])[0][0]
+    paid=float(request.form['amount'])
+    if paidOld==None :
+        paidOld=0
+    remain = sum - paidOld - paid
+    print(pgsql_reserv_active_id(pgsql_clientid_by_mail(session['email'])[0][0])[0][0])
+    pgsql_paiement(paid,pgsql_reserv_active_id(pgsql_clientid_by_mail(session['email'])[0][0])[0][0])
+    return render_template("confirm-paiement.html", session=session, paid=paid,remain=remain)
 
 
 
@@ -117,7 +137,7 @@ def payer_reserv():
 # ---------- BDD SETUP -------------
 #interaction avec PostGres6
 
-4
+
 def pgsql_connect():
     try:
         db = psycopg2.connect("host=dbserver.emi.u-bordeaux.fr dbname=adanguin user=adanguin")
@@ -149,6 +169,9 @@ def liste_produits():
 def pgsql_reserv_active(idclient):
     return pgsql_select('select date_fin from hotel2019.Reservation where idclient=\'%s\' and date_fin>=current_date ;'% (idclient))
 
+def pgsql_reserv_active_id(idclient):
+    return pgsql_select('select idreserv from hotel2019.Reservation where idclient=\'%s\' and date_debut<=current_date and date_fin>=current_date ;'% (idclient))
+
 def pgsql_exist_reserv(idclient):
     return pgsql_select('select exists (select true from hotel2019.Reservation where idclient=\'%s\' and date_fin>=current_date );'% (idclient))
 
@@ -173,7 +196,14 @@ def pgsql_somme_conso(idclient,d,f):
         t=pgsql_tarifproduit(row[0])[0][0]
         sum=sum+(t*row[1])
     return sum
-#-----------------Part II -------------
+
+def pgsql_get_paid(id):
+        temp = pgsql_select('select sum(somme) from hotel2019.paiement where "Numreservation"=\'%s\';'%(int(id)))
+        return temp
+
+def pgsql_list_paid(id):
+        temp = pgsql_select('select * from hotel2019.paiement where "Numreservation"=\'%s\';'%(int(id)))
+        return temp
 def pgsql_client_by_mail(mail):
     return pgsql_select('select nom from Hotel2019.Client where mail=\'%s\';' % (mail))
 
@@ -193,7 +223,10 @@ def pgsql_ajout_consommation(idclient,idproduit,qte):
 
 def pgsql_ajout_reserv(chambreID,date_debut,date_fin,clientID):
     print(chambreID)
-    return pgsql_insert('insert into Hotel2019.Reservation values(\'%s\',\'%s\',\'%s\',\'%s\');' % (chambreID,date_debut,date_fin,clientID))
+    return pgsql_insert('insert into Hotel2019.Reservation values(\'%s\',\'%s\',\'%s\',\'%s\',DEFAULT);' % (chambreID,date_debut,date_fin,clientID))
+
+def pgsql_paiement(somme,id):
+    return pgsql_insert('insert into Hotel2019.paiement values(\'%s\',current_date,\'%s\');' % ((float(somme),int(id))))
 # -------------------------------------- DB ACCESS & CONTROLS ------
 def pgsql_select(command):
     db = pgsql_connect()

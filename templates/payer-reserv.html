@@ -15,7 +15,7 @@
 <table id="reservtlist">
   <thead>
       <tr>
-          <th colspan="2">Facture : </th>
+          <th colspan="2">Note : </th>
       </tr>
   </thead>
 
@@ -27,6 +27,8 @@
       <td>tarif par nuit</td>
       <td>total chambre</td>
       <td>total consommations</td>
+      <td><b>total dû</b></td>
+      <td><i>partie payée</i></td>
     </tr>
       <tr>
           <td>{{n}}</td>
@@ -35,10 +37,18 @@
           <td>{{t}} €</td>
           <td>{{tch}} €</td>
           <td>{{tco}} €</td>
+          <td><b>{{sum}} €</b></td>
+          <td><i>{{paid}} €</i></td>
       </tr>
   </tbody>
 </table>
-
+ <br>
+  <br>
+<form method="POST" action="{{url_for('confirm_paiement')}}">
+  <label>Vous pouvez saisir une somme à payer :</label><br>
+ 	<input type="number" placeholder="1.0" step="0.01" min="0" max="{{remain}}" name=amount id=amount required />
+  	<input type="submit" value="Soumettre" />
+</form>
 <p>Alternativement,</p>
  <br>
  <a href="{{url_for('back_to_menu')}}">Retour au menu</a><br>
