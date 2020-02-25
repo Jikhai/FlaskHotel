@@ -73,7 +73,12 @@ def actionmenu(session):
 @app.route('/consult_reserv/', methods=['POST','GET'])
 def consult_reserv():
     rows= pgsql_liste_reserv(pgsql_clientid_by_mail(session['email'])[0][0])
-    rows2= pgsql_list_paid(pgsql_reserv_active_id(pgsql_clientid_by_mail(session['email'])[0][0])[0][0])
+    id=pgsql_reserv_active_id(pgsql_clientid_by_mail(session['email'])[0][0])
+    if id :
+        id=id[0][0]
+        rows2= pgsql_list_paid(id)
+    else:
+        rows2=None
     return render_template("consult-reserv.html", session=session, rows=rows, rows2=rows2)
 
 @app.route('/choisir_chambre/', methods=['POST','GET'])
