@@ -1,0 +1,50 @@
+[
+  {
+    "chambre_id":7,
+    "nom":"Home",
+    "étage":"0",
+    "vue":"Ruines anciennes",
+    "couchage":"Lit simple",
+    "salle de bain": "Non"
+  },
+  {
+    "chambre_id":8,
+    "nom": "Snowed-Inn",
+    "étage": "1",
+    "vue": "Fôret enneigée",
+    "couchage": "Lit triple",
+    "salle de bain": "Douche simple"
+  },
+  {
+    "chambre_id":9,
+    "nom": "Waterfall",
+    "étage": "1",
+    "vue": "Chutes d'eaux",
+    "couchage": "Matelas à eau",
+    "salle de bain": "Grande douche froide"
+  },
+  {
+    "chambre_id":10,
+    "nom": "Hotlands",
+    "étage": "2",
+    "vue": "Centrale géothermique",
+    "couchage": "Lit cubique pliable",
+    "salle de bain": "Douche vapeur"
+  },
+  {
+    "chambre_id":11,
+    "nom": "Core",
+    "étage": "4",
+    "vue": "Pas de fenêtres",
+    "couchage": "hamack de cables électriques",
+    "salle de bain": "Non"
+  },
+  {
+    "chambre_id":12,
+    "nom": "Throne",
+    "étage": "10",
+    "vue": "Toutes, et bien au delà",
+    "couchage": "Lit de fleurs : Renoncules",
+    "salle de bain": "Douche de type arrosoire"
+  }
+]

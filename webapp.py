@@ -4,7 +4,7 @@ import sys
 import psycopg2
 from datetime import *
 from datetime import timedelta
-
+from pymongo import *
 today= date.today().strftime("%d/%m/%Y")
 date= date.today()
 tomorrow= datetime.now()+timedelta(days=1)
@@ -18,6 +18,7 @@ app.secret_key = 'some_secret'
 @app.route("/<error>")
 def hello(error=None):
     session.clear()
+    #mgdb_init_db()
     return render_template("choisir-mail.html", rows=liste_mail(), hasError=error, session=session)
 
 @app.route('/after_choisir_email/', methods=['POST','GET'])
@@ -84,7 +85,7 @@ def consult_reserv():
 @app.route('/choisir_chambre/', methods=['POST','GET'])
 def choisir_chambre():
 
-    return render_template("choisir-chambre.html", session=session, rows=liste_chambres(), date=today, tomorrow=tomorrow)
+    return render_template("choisir-chambre.html", session=session, rows=liste_chambres(), date=today, tomorrow=tomorrow, desc=mgdb_display_chambres())
 
 @app.route('/confirmation_reserv/', methods=['POST','GET'])
 def confirm_reserv():
@@ -266,6 +267,56 @@ def pgsql_insert(command):
             flash ('Service Unavailable')
             return redirect(url_for('hello', error=str(e)))
 #--------------------------------------------------------------------------------------------
+#MongoDB
+def get_mg_db():
+    db=MongoClient("mongodb.emi.u-bordeaux.fr:27017").adanguin
+    return db
+
+def mgdb_drop_db():
+    mgdb = get_mg_db()
+    mgdb.chambres.drop()
+    mgdb.comments.drop()
+
+def mgdb_init_db():
+    mgdb = get_mg_db()
+    with app.open_resource('static/hotel_chambres.json') as f:
+        mgdb.chambres.insert(json.loads(f.read().decode('utf8')))
+
+def mgdb_display_chambre(idchambre):
+    mgdb = get_mg_db()
+    if mgdb:
+        return mgdb.chambres.find({"chambre_id":int(idchambre)})
+    else:
+        return None
+def mgdb_display_chambres():
+    mgdb = get_mg_db()
+    if mgdb:
+        return mgdb.chambres
+    else:
+        return None
+def mgdb_display_comments(idChambre):
+    mdgb = det_mg_db()
+    if mgdb:
+        return mgdb.comments.find({"chambre_id":int(idChambre)})
+    else:
+        return None
+
+def mgdb_insert_comment(idChambre, nom, prenom, jour, debut, fin, avis):
+    mdgb = get_mg_db()
+    result = mgdb.comments.insert(
+        {
+            "chambre_id": int(idChambre),
+            "client_nom": nom,
+            "client_prenom": prenom,
+            "date": jour,
+            "date_debut": debut,
+            "date_fin": fin,
+            "avis": avis
+        }
+    )
+    return result
+
+
 #DO NOT TOUCH THIS
 if __name__ == "__main__":
    app.run(debug=True)
