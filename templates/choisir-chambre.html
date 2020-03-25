@@ -24,18 +24,36 @@
     <tr>
       <td>ID#</td>
       <td>Tarif</td>
+      <td>Nom</td>
+      <td>étage</td>
+      <td>vue</td>
+      <td>couche</td>
+      <td>salle de bain</td>
     </tr>
     {%if rows %}
       {% for row in rows %}
       <tr>
           <td>{{row[0]}}</td>
           <td>{{row[1]}} €/Nuit </td>
+	  {%if desc %}
+	  	{% for chambre in desc %}	  
+	      		{%if row[0]== chambre.chambre_id %}
+			<td>{{chambre.nom}}</td>
+			<td>{{chambre.étage}}</td>
+			<td>{{chambre.vue}}</td>
+			<td>{{chambre.couchage}}</td>
+			<td>{{chambre.salledebain}}</td>		
+	      		{%endif%}
+	  	{% endfor %}
+	  {%endif%}
+ 
+	
       </tr>
       {% endfor %}
     {%endif%}
   </tbody>
 </table>
-<br/>
+<br>
 <form method="POST" action="{{url_for('confirm_reserv')}}">
 {%if rows %}
 <label>Choisissez une chambre disponible :</label><br>

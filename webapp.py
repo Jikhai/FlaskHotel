@@ -18,7 +18,8 @@ app.secret_key = 'some_secret'
 @app.route("/<error>")
 def hello(error=None):
     session.clear()
-    #mgdb_init_db()
+    mgdb_drop_db()
+    mgdb_init_db()
     return render_template("choisir-mail.html", rows=liste_mail(), hasError=error, session=session)
 
 @app.route('/after_choisir_email/', methods=['POST','GET'])
@@ -281,6 +282,7 @@ def mgdb_init_db():
     mgdb = get_mg_db()
     with app.open_resource('static/hotel_chambres.json') as f:
         mgdb.chambres.insert(json.loads(f.read().decode('utf8')))
+    print("db init")
 
 def mgdb_display_chambre(idchambre):
     mgdb = get_mg_db()
@@ -291,7 +293,7 @@ def mgdb_display_chambre(idchambre):
 def mgdb_display_chambres():
     mgdb = get_mg_db()
     if mgdb:
-        return mgdb.chambres
+        return [chambre for chambre in mgdb.chambres.find()]
     else:
         return None
 def mgdb_display_comments(idChambre):
@@ -306,8 +308,7 @@ def mgdb_insert_comment(idChambre, nom, prenom, jour, debut, fin, avis):
     result = mgdb.comments.insert(
         {
             "chambre_id": int(idChambre),
-            "client_nom": nom,
-            "client_prenom": prenom,
+            "client_nom": nom, 
             "date": jour,
             "date_debut": debut,
             "date_fin": fin,
